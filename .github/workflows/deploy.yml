@@ -1,0 +1,64 @@
+name: Upload Lambda Package
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+
+      - name: Build Lambda package
+        run: bash build.sh
+
+      - name: Get latest tag
+        id: get_tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          release_name: Release ${{ steps.get_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload asset to existing release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          files: ./function/package.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Configure AWS CLI"
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # https://docs.aws.amazon.com/cli/v1/userguide/cli-usage-output.html#cli-usage-output-sensitive
+      # TODO:
+      # - Considerar usar um job mais adequado para deploy
+      # - Usar um filtro no output para expor apenas o que for relevante
+      - name: "Deploy Lambda Function"
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDA_NAME }} \
+            --zip-file fileb://function/package.zip \
+            --output "text" > /dev/null

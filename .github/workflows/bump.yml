@@ -1,0 +1,26 @@
+name: Bump and Create Release
+
+on:
+  push:
+    branches:
+      - "develop"
+  workflow_dispatch:
+
+jobs:
+  bump-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Bump version
+        id: version-bump
+        uses: phips28/gh-action-bump-version@master
+        with:
+          tag-prefix: "v"
+          minor-wording: "feat,minor"
+          patch-wording: "patch,fix,fixes"
+          default: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
