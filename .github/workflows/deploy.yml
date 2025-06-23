@@ -26,16 +26,16 @@ jobs:
           path: "./"
 
       - name: Build Lambda package
-        if: steps.check_version.outputs.changed == 'true'
+        if: steps.check_version.outputs.release != ''
         run: bash build.sh
 
       - name: Get latest tag
-        if: steps.check_version.outputs.changed == 'true'
+        if: steps.check_version.outputs.release != ''
         id: get_tag
         uses: actions-ecosystem/action-get-latest-tag@v1
 
       - name: Create release
-        if: steps.check_version.outputs.changed == 'true'
+        if: steps.check_version.outputs.release != ''
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -47,7 +47,7 @@ jobs:
           prerelease: false
 
       - name: Upload asset to release
-        if: steps.check_version.outputs.changed == 'true'
+        if: steps.check_version.outputs.release != ''
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_tag.outputs.tag }}
