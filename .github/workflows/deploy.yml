@@ -45,20 +45,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Configure AWS CLI"
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      # https://docs.aws.amazon.com/cli/v1/userguide/cli-usage-output.html#cli-usage-output-sensitive
-      # TODO:
-      # - Considerar usar um job mais adequado para deploy
-      # - Usar um filtro no output para expor apenas o que for relevante
-      - name: "Deploy Lambda Function"
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ secrets.LAMBDA_NAME }} \
-            --zip-file fileb://function/package.zip \
-            --output "text" > /dev/null
+      # - name: "Configure AWS CLI"
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+      #
+      # # https://docs.aws.amazon.com/cli/v1/userguide/cli-usage-output.html#cli-usage-output-sensitive
+      # # TODO:
+      # # - Considerar usar um job mais adequado para deploy
+      # # - Usar um filtro no output para expor apenas o que for relevante
+      # - name: "Deploy Lambda Function"
+      #   run: |
+      #     aws lambda update-function-code \
+      #       --function-name ${{ secrets.LAMBDA_NAME }} \
+      #       --zip-file fileb://function/package.zip \
+      #       --output "text" > /dev/null
