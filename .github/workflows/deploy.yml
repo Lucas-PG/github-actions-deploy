@@ -19,14 +19,23 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Check for version change
+        id: check_version
+        uses: kriasoft/check-version@v1
+        with:
+          path: "./"
+
       - name: Build Lambda package
+        if: steps.check_version.outputs.changed == 'true'
         run: bash build.sh
 
       - name: Get latest tag
+        if: steps.check_version.outputs.changed == 'true'
         id: get_tag
         uses: actions-ecosystem/action-get-latest-tag@v1
 
       - name: Create release
+        if: steps.check_version.outputs.changed == 'true'
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -37,7 +46,8 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload asset to existing release
+      - name: Upload asset to release
+        if: steps.check_version.outputs.changed == 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_tag.outputs.tag }}
@@ -45,18 +55,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: "Configure AWS CLI"
+      # - name: Configure AWS CLI
+      #   if: steps.check_version.outputs.changed == 'true'
       #   uses: aws-actions/configure-aws-credentials@v2
       #   with:
       #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
       #     aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
       #     aws-region: ${{ secrets.AWS_REGION }}
-      #
-      # # https://docs.aws.amazon.com/cli/v1/userguide/cli-usage-output.html#cli-usage-output-sensitive
-      # # TODO:
-      # # - Considerar usar um job mais adequado para deploy
-      # # - Usar um filtro no output para expor apenas o que for relevante
-      # - name: "Deploy Lambda Function"
+
+      # - name: Deploy Lambda Function
+      #   if: steps.check_version.outputs.changed == 'true'
       #   run: |
       #     aws lambda update-function-code \
       #       --function-name ${{ secrets.LAMBDA_NAME }} \
