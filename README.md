@@ -4,8 +4,8 @@ The first version of this repository (1.0.0) contains 2 github actions:
 
 - `bump`: bumps the repo version only when the commits include the keywords:
   - _patch, fix, fixes_: patch
-  - _feat or minor_: minor
-  - _MAJOR or cut-major_: major
+  - _feat, minor_: minor
+  - _major, BREAKING CHANGE_: major
 - `deploy`: creates a new release on the repository and uploads a lambda function to AWS.
 
 The bump version runs when there is a commit on branch `develop`, while the deploy version runs when there is a commit on the branch `main`, but only if the version is changed.
