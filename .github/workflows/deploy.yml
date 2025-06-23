@@ -1,7 +1,7 @@
 name: Upload Lambda Package
 
 on:
-  pull_request:
+  push:
     branches:
       - "main"
   workflow_dispatch:
@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2 # necessário para comparar versões
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -20,22 +22,22 @@ jobs:
           python-version: "3.12"
 
       - name: Check for version change
-        id: check_version
-        uses: kriasoft/check-version@v1
+        id: version_check
+        uses: EndBug/version-check@v2
         with:
-          path: "./"
+          path: "package.json"
 
       - name: Build Lambda package
-        if: steps.check_version.outputs.release != ''
+        if: steps.version_check.outputs.changed == 'true'
         run: bash build.sh
 
       - name: Get latest tag
-        if: steps.check_version.outputs.release != ''
+        if: steps.version_check.outputs.changed == 'true'
         id: get_tag
         uses: actions-ecosystem/action-get-latest-tag@v1
 
       - name: Create release
-        if: steps.check_version.outputs.release != ''
+        if: steps.version_check.outputs.changed == 'true'
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -47,7 +49,7 @@ jobs:
           prerelease: false
 
       - name: Upload asset to release
-        if: steps.check_version.outputs.release != ''
+        if: steps.version_check.outputs.changed == 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_tag.outputs.tag }}
