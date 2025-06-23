@@ -1,0 +1,19 @@
+{
+  "name": "github-actions-deploy",
+  "version": "2.0.0",
+  "description": "a repository to test github actions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucas-PG/github-actions-deploy.git"
+  },
+  "author": "Lucas P. Gasperin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lucas-PG/github-actions-deploy/issues"
+  },
+  "homepage": "https://github.com/Lucas-PG/github-actions-deploy#readme"
+}
